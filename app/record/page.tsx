@@ -128,7 +128,7 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'd' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                Type A
+                Doctor
               </button>
               <button
                 onClick={() => setProcessType('p')}
@@ -139,7 +139,7 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'p' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                Type B
+                Patient
               </button>
             </div>
             <div className="p-6 flex-1 flex flex-col">
