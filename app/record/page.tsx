@@ -54,16 +54,14 @@ export default function TranscriptDisplay() {
 
   const renderMessage = (text: string) => {
     const parts = text.split(/(<[^>]+>)/g);
-
+    var idx = -1;
     return parts.map((part, index) => {
       if (part.match(/^<[^>]+>$/)) {
         const cleanText = part.slice(1, -1);
+        idx++;
         return (
-          <span key={index} className="bg-yellow-200 font-semibold px-1 rounded">
+          <span key={index} data-index={idx} className="bg-yellow-200 font-semibold px-1 rounded">
             {cleanText}
-            <span className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 whitespace-pre-line text-sm bg-slate-800 text-white rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 w-56 text-center shadow-lg z-50">
-                "hi"
-            </span>
           </span>
         );
       }
