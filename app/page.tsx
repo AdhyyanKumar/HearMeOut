@@ -8,23 +8,23 @@ import { Mic, History, ChevronLeft, ChevronRight } from 'lucide-react';
 const testimonials = [
   {
     quote: "HearMeOut transformed how I capture ideas. The real-time transcription is incredibly accurate and the processing features save me hours of work.",
-    author: "Adhyyan Kumar",
-    role: "Front End Developer, HearMeOut"
+    author: "Sarah Chen",
+    role: "Product Manager, TechCorp"
   },
   {
     quote: "The dual processing types give me exactly what I need. Type A for quick notes, Type B for detailed analysis. It's like having an assistant.",
-    author: "Ansh Mathur",
-    role: "Back End Developer, HearMeOut"
+    author: "Michael Rodriguez",
+    role: "Founder & CEO, StartupLabs"
   },
   {
     quote: "I use HearMeOut for all my meetings now. The transcription quality is exceptional and I never miss important details anymore.",
-    author: "Diyan Chokshi",
-    role: "Back End Developer, HearMeOut"
+    author: "Emily Watson",
+    role: "Marketing Director, CreativeFlow"
   },
   {
     quote: "As a researcher, accurate transcription is crucial. HearMeOut delivers consistently and the interface is beautifully intuitive.",
-    author: "ChatGPT And Bolt",
-    role: "The Goats Behind Everything, HearMeOut"
+    author: "Dr. James Anderson",
+    role: "Research Scientist, InnovateLab"
   }
 ];
 
@@ -52,6 +52,7 @@ export default function LandingPage() {
       setIsTransitioning(false);
     }, 300);
   };
+
   const prevTestimonial = () => {
     setIsTransitioning(true);
     setTimeout(() => {
@@ -172,8 +173,8 @@ export default function LandingPage() {
                 </svg>
               </div>
               <div>
-                <h4 className="text-white font-semibold mb-1">Understand Your Doctor And Patient</h4>
-                <p className="text-slate-400 text-sm">Choose between Doctor And Patient processing</p>
+                <h4 className="text-white font-semibold mb-1">Dual Processing Types</h4>
+                <p className="text-slate-400 text-sm">Choose between Type A and Type B processing</p>
               </div>
             </div>
 

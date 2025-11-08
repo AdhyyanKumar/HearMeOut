@@ -2,6 +2,15 @@ const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c13
 const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook/12fb4fbf-2caa-4482-af7a-95fd047d649d";
 const END_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook-test/8ff67b70-9f7c-4e03-9dd1-11c3059e219a";
 
+export interface ConversationResult {
+  conversationId: string;
+  transcript: string;
+  summary: string;
+  soap: string;
+  ehr: string;
+  words: any[];
+}
+
 export class TranscriptionService {
   private listeners: ((text: string) => void)[] = [];
   private errorListeners: ((error: string) => void)[] = [];
@@ -10,6 +19,7 @@ export class TranscriptionService {
   private audioChunks: Blob[] = [];
   private sendInterval: NodeJS.Timeout | null = null;
   private conversationId: string | null = null;
+  private fullTranscript: string = '';
 
   subscribe(callback: (text: string) => void) {
     this.listeners.push(callback);
@@ -28,6 +38,7 @@ export class TranscriptionService {
   }
 
   private notifyListeners(text: string) {
+    this.fullTranscript += text;
     this.listeners.forEach(listener => listener(text));
   }
 
@@ -56,10 +67,10 @@ export class TranscriptionService {
     }
   }
 
-    private async endConversation() {
+    private async endConversation(): Promise<ConversationResult | null> {
     if (!this.conversationId) {
       console.warn("⚠️ Tried to end conversation but no ID found.");
-      return;
+      return null;
     }
 
     try {
@@ -73,12 +84,24 @@ export class TranscriptionService {
       });
 
       if (res.ok) {
-        console.log(`✅ Conversation ${this.conversationId} ended successfully.`);
+        const data = await res.json();
+        console.log(`✅ Conversation ${this.conversationId} ended successfully:`, data);
+
+        return {
+          conversationId: this.conversationId,
+          transcript: this.fullTranscript,
+          summary: data[0]?.summary || '',
+          soap: data[1]?.soap || '',
+          ehr: data[2]?.ehr || '',
+          words: data[3]?.words || [],
+        };
       } else {
         console.error("❌ Failed to end conversation:", res.status, res.statusText);
+        return null;
       }
     } catch (err) {
       console.error("❌ Error sending end conversation webhook:", err);
+      return null;
     }
   }
 
@@ -119,11 +142,11 @@ export class TranscriptionService {
     }
   }
 
-  async start() {
-    if (this.isActive) return;
+  async start(): Promise<boolean> {
+    if (this.isActive) return false;
 
     const conversationId = await this.createConversation();
-    if (!conversationId) return;
+    if (!conversationId) return false;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -131,6 +154,7 @@ export class TranscriptionService {
 
       this.isActive = true;
       this.audioChunks = [];
+      this.fullTranscript = '';
 
       this.mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm',
@@ -152,7 +176,7 @@ export class TranscriptionService {
       };
 
       this.mediaRecorder.start();
-      console.log('🔴 Recording started, will send audio chunks every 2 seconds');
+      console.log('🔴 Recording started, will send audio chunks every 10 seconds');
 
       this.sendInterval = setInterval(() => {
         if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
@@ -166,15 +190,18 @@ export class TranscriptionService {
         }
       }, 10000);
 
+      return true;
+
     } catch (error) {
       console.error('❌ Error accessing microphone:', error);
       this.notifyError('Could not access microphone. Please check permissions.');
       this.isActive = false;
+      return false;
     }
   }
 
-  async stop() {
-    if (!this.isActive) return;
+  async stop(): Promise<ConversationResult | null> {
+    if (!this.isActive) return null;
 
     this.isActive = false;
 
@@ -196,7 +223,8 @@ export class TranscriptionService {
 
     console.log('⏹️ Recording stopped');
 
-    await this.endConversation();
+    const result = await this.endConversation();
+    return result;
   }
 
 
