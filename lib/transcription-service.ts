@@ -105,7 +105,7 @@ export class TranscriptionService {
             }
           }, 100);
         }
-      }, 3000);
+      }, 5000);
 
     } catch (error) {
       console.error('❌ Error accessing microphone:', error);
