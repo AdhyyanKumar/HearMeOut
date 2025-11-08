@@ -123,6 +123,22 @@ export default function ConversationDetailPage() {
     );
   }
 
+  const renderMessage = (text: string) => {
+    const parts = text.split(/(<[^>]+>)/g);
+
+    return parts.map((part, index) => {
+      if (part.match(/^<[^>]+>$/)) {
+        const cleanText = part.slice(1, -1);
+        return (
+          <span key={index} className="bg-yellow-200 font-semibold px-1 rounded">
+            {cleanText}
+          </span>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
@@ -144,7 +160,7 @@ export default function ConversationDetailPage() {
             </div>
             <div className="max-h-96 overflow-y-auto">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {data.transcript || 'No transcript available'}
+                {renderMessage(data.transcript || 'No transcript available')}
               </p>
             </div>
           </div>
