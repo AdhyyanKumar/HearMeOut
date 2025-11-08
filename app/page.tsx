@@ -10,7 +10,7 @@ export default function TranscriptDisplay() {
 
   useEffect(() => {
     const unsubscribe = transcriptionService.subscribe((textChunk) => {
-      setTranscript((prev) => prev + textChunk);
+      setTranscript(textChunk);
     });
 
     const unsubscribeErrors = transcriptionService.subscribeToErrors((error) => {
