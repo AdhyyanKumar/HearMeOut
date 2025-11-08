@@ -70,7 +70,7 @@ export default function TranscriptDisplay() {
       setIsRecording(false);
 
       if (result) {
-        sessionStorage.setItem('conversationResult', JSON.stringify(result));
+        //sessionStorage.setItem('conversationResult', JSON.stringify(result));
         router.push(`/conversation?id=${result.conversationId}`);
       }
     } else {

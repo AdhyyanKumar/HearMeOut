@@ -79,7 +79,7 @@ export default function ConversationDetailPage() {
         // ✅ Construct safe normalized data object
         setData({
           conversationId,
-          transcript: safeValue(parsedResult.MOD_INP || parsedResult.transcript),
+          transcript: safeValue(parsedResult.CLASSIFIED || parsedResult.transcript),
           summary: safeValue(parsedResult.SUMMARY || parsedResult.summary),
           soap: safeValue(parsedResult.SOAP || parsedResult.soap),
           ehr: safeValue(parsedResult.EHR || parsedResult.ehr),
