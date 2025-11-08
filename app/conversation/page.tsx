@@ -58,13 +58,18 @@ export default function ConversationDetailPage() {
 
         const result = await response.json();
 
+        let parsedResult = result;
+        if (Array.isArray(result) && result.length > 0) {
+          parsedResult = result[0];
+        }
+
         setData({
           conversationId,
-          transcript: result.transcript || '',
-          summary: result[0]?.summary || '',
-          soap: result[1]?.soap || '',
-          ehr: result[2]?.ehr || '',
-          words: result[3]?.words || [],
+          transcript: parsedResult.MOD_INP || parsedResult.transcript || '',
+          summary: parsedResult.SUMMARY || parsedResult.summary || '',
+          soap: parsedResult.SOAP || parsedResult.soap || '',
+          ehr: parsedResult.EHR || parsedResult.ehr || '',
+          words: parsedResult.WORDS || parsedResult.words || [],
         });
       } catch (err) {
         console.error('Error loading conversation:', err);
