@@ -8,6 +8,7 @@ export default function TranscriptDisplay() {
   const [transcript, setTranscript] = useState<string>('');
   const [processedText, setProcessedText] = useState<string>('');
   const [isRecording, setIsRecording] = useState(false);
+  const [processType, setProcessType] = useState<'d' | 'p'>('d');
   const transcriptRef = useRef<HTMLDivElement>(null);
   const processedRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +72,7 @@ export default function TranscriptDisplay() {
     <div className="h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex flex-col items-center p-8">
       <div className={`transition-all duration-700 ease-in-out flex flex-col items-center absolute left-1/2 -translate-x-1/2 ${isRecording ? 'top-8' : 'top-1/2 -translate-y-1/2'}`}>
         <h1 className={`transition-all duration-700 ease-in-out font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-6 ${
-          isRecording ? 'text-4xl' : 'text-6xl'
+          isRecording ? 'text-5xl' : 'text-7xl'
         }`}>
           HearMeOut
         </h1>
@@ -116,21 +117,48 @@ export default function TranscriptDisplay() {
         <div className="transform transition-all duration-700 ease-out delay-100 h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(100px)',
         }}>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-200 h-full flex flex-col">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-200">
-              <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <h2 className="text-xl font-semibold text-slate-800">Processed Output</h2>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 h-full flex flex-col">
+            <div className="flex border-b border-slate-200">
+              <button
+                onClick={() => setProcessType('d')}
+                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 transition-all duration-200 ${
+                  processType === 'd'
+                    ? 'text-emerald-600 border-b-2 border-emerald-500 font-semibold'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full ${processType === 'd' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                Type A
+              </button>
+              <button
+                onClick={() => setProcessType('p')}
+                className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 transition-all duration-200 ${
+                  processType === 'p'
+                    ? 'text-emerald-600 border-b-2 border-emerald-500 font-semibold'
+                    : 'text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <div className={`w-2 h-2 rounded-full ${processType === 'p' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                Type B
+              </button>
             </div>
-            <div ref={processedRef} className="flex-1 overflow-y-auto">
-              {processedText.length === 0 ? (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-slate-400 text-center">Processing will appear here...</p>
-                </div>
-              ) : (
-                <p className="text-slate-700 leading-relaxed text-base whitespace-pre-wrap">
-                  {processedText}
-                </p>
-              )}
+            <div className="p-6 flex-1 flex flex-col">
+              <div ref={processedRef} className="flex-1 overflow-y-auto">
+                {processedText.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-slate-400 text-center">
+                      {processType === 'd' ? 'Doctor\'s processing will appear here...' : 'Patient\'s processing will appear here...'}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-xs text-slate-500 mb-2">Using Process Type {processType.toUpperCase()}</div>
+                    <p className="text-slate-700 leading-relaxed text-base whitespace-pre-wrap">
+                      {processedText}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
