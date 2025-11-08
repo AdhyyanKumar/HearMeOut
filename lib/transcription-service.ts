@@ -1,4 +1,5 @@
 const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c135-49db-8aa3-95d2085f0b03';
+const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook-test/12fb4fbf-2caa-4482-af7a-95fd047d649d";
 
 export class TranscriptionService {
   private listeners: ((text: string) => void)[] = [];
@@ -7,6 +8,7 @@ export class TranscriptionService {
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: Blob[] = [];
   private sendInterval: NodeJS.Timeout | null = null;
+  private conversationId: string | null = null;
 
   subscribe(callback: (text: string) => void) {
     this.listeners.push(callback);
@@ -32,11 +34,38 @@ export class TranscriptionService {
     this.errorListeners.forEach(listener => listener(error));
   }
 
+  private async createConversation(): Promise<string | null> {
+    try {
+      const res = await fetch(CREATE_CONVERSATION_WEBHOOK, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error(`Conversation webhook failed: ${res.status}`);
+      const data = await res.json();
+      console.log("🆕 Created new conversation:", data);
+
+      // Assuming your webhook returns something like { id: 42 } or { conversation_id: "1234" }
+      const id = data.id || data.conversation_id;
+      this.conversationId = id?.toString() ?? null;
+
+      return this.conversationId;
+    } catch (err) {
+      console.error("❌ Failed to create conversation:", err);
+      this.notifyError("Could not start a new conversation.");
+      return null;
+    }
+  }
+
   private async sendAudioToWebhook(audioBlob: Blob) {
+    if (!this.conversationId) {
+      console.warn("⚠️ No conversationId — skipping audio send");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
       formData.append('timestamp', new Date().toISOString());
+      formData.append("conversation_id", this.conversationId);
 
       console.log('📤 Sending audio chunk to webhook:', audioBlob.size, 'bytes');
 
@@ -65,6 +94,9 @@ export class TranscriptionService {
 
   async start() {
     if (this.isActive) return;
+
+    const conversationId = await this.createConversation();
+    if (!conversationId) return;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
