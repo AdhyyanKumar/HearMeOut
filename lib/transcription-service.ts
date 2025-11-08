@@ -1,5 +1,5 @@
 const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c135-49db-8aa3-95d2085f0b03';
-const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook-test/12fb4fbf-2caa-4482-af7a-95fd047d649d";
+const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook/12fb4fbf-2caa-4482-af7a-95fd047d649d";
 
 export class TranscriptionService {
   private listeners: ((text: string) => void)[] = [];
