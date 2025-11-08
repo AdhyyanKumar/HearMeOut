@@ -56,7 +56,7 @@ export default function TranscriptDisplay() {
       <div className="w-full max-w-3xl bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-blue-100">
         <div className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2 text-center">
-            Real-Time Transcript Monitor
+            HearMeOut
           </h1>
           <p className="text-sm text-blue-600/70 text-center">
             Live transcription with intelligent highlighting
