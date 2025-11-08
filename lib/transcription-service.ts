@@ -1,4 +1,4 @@
-const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook/a448e16a-c135-49db-8aa3-95d2085f0b03';
+const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c135-49db-8aa3-95d2085f0b03';
 const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook/12fb4fbf-2caa-4482-af7a-95fd047d649d";
 const END_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook-test/8ff67b70-9f7c-4e03-9dd1-11c3059e219a";
 
@@ -188,7 +188,7 @@ export class TranscriptionService {
             }
           }, 100);
         }
-      }, 15000);
+      }, 10000);
 
       return true;
 
