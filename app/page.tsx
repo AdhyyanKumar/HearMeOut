@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, History, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Stethoscope, Mic, History, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const testimonials = [
   {
@@ -67,17 +67,17 @@ export default function LandingPage() {
         <div>
           <div className="flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Mic className="w-6 h-6 text-white" />
+              <Stethoscope className="w-6 h-6 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-cyan-400">HearMeOut</h1>
           </div>
 
           <div className="max-w-xl">
             <h2 className="text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Turn your voice into reality
+              Turn your voice into clarity
             </h2>
             <p className="text-lg text-slate-400 mb-8">
-              Join thousands of professionals who are capturing their ideas in real-time with HearMeOut's intelligent transcription and processing.
+              HearMeOut transcribes, simplifies, and summarizes your consultations in real-time — so you can stay present with your patient, not your paperwork.
             </p>
           </div>
         </div>
@@ -128,11 +128,11 @@ export default function LandingPage() {
 
       <div className="flex-1 flex flex-col items-center justify-center p-12 lg:p-16">
         <div className="max-w-md w-full">
-          <h3 className="text-3xl font-bold text-white text-center mb-4">
-            Start Your Journey
+          <h3 className="text-3xl font-bold text-white text-center mb-2">
+            Start A New Session
           </h3>
           <p className="text-slate-400 text-center mb-8">
-            Begin capturing and processing your voice instantly
+            Begin capturing and processing<br></br>your consultations instantly
           </p>
 
           <div className="space-y-4">
@@ -153,7 +153,7 @@ export default function LandingPage() {
             </Button>
           </div>
 
-          <div className="mt-12 space-y-6">
+          <div className="mt-32 space-y-6">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,8 +173,8 @@ export default function LandingPage() {
                 </svg>
               </div>
               <div>
-                <h4 className="text-white font-semibold mb-1">Dual Processing Types</h4>
-                <p className="text-slate-400 text-sm">Choose between Type A and Type B processing</p>
+                <h4 className="text-white font-semibold mb-1">Dual-View for Doctor & Patient</h4>
+                <p className="text-slate-400 text-sm">Clinical for doctors, simplified for patients</p>
               </div>
             </div>
 
