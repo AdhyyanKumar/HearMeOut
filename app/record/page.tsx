@@ -69,7 +69,7 @@ export default function TranscriptDisplay() {
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex flex-col items-center p-8">
-      <div className={`transition-all duration-700 ease-in-out flex flex-col items-center ${isRecording ? 'mt-8' : 'flex-1 justify-center'}`}>
+      <div className={`transition-all duration-700 ease-in-out flex flex-col items-center absolute left-1/2 -translate-x-1/2 ${isRecording ? 'top-8' : 'top-1/2 -translate-y-1/2'}`}>
         <h1 className={`transition-all duration-700 ease-in-out font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-6 ${
           isRecording ? 'text-4xl' : 'text-6xl'
         }`}>
@@ -88,9 +88,9 @@ export default function TranscriptDisplay() {
         </Button>
       </div>
 
-      <div className={`w-full max-w-7xl mt-8 flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-700 ${
+      <div className={`w-full max-w-7xl absolute bottom-8 left-1/2 -translate-x-1/2 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-700 ${
         isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none'
-      }`}>
+      }`} style={{ height: 'calc(100vh - 280px)' }}>
         <div className="transform transition-all duration-700 ease-out h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(-100px)',
         }}>
