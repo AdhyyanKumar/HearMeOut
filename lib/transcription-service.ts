@@ -188,7 +188,7 @@ export class TranscriptionService {
             }
           }, 100);
         }
-      }, 5000);
+      }, 15000);
 
       return true;
 
