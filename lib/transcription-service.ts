@@ -1,4 +1,4 @@
-const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook/a448e16a-c135-49db-8aa3-95d2085f0b03';
+const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c135-49db-8aa3-95d2085f0b03';
 
 export class TranscriptionService {
   private listeners: ((text: string) => void)[] = [];
@@ -59,7 +59,7 @@ export class TranscriptionService {
       }
     } catch (error) {
       console.error('❌ Error sending audio to webhook:', error);
-      this.notifyError('Failed to send audio to webhook');
+      //this.notifyError('Failed to send audio to webhook');
     }
   }
 
