@@ -33,47 +33,61 @@ export default function ConversationDetailPage() {
     }
 
     const loadConversation = async () => {
-      const stored = sessionStorage.getItem('conversationResult');
+      const stored = sessionStorage.getItem("conversationResult");
 
       if (stored) {
         const parsedData = JSON.parse(stored);
         if (parsedData.conversationId === conversationId) {
           setData(parsedData);
           setLoading(false);
-          sessionStorage.removeItem('conversationResult');
+          sessionStorage.removeItem("conversationResult");
           return;
         }
       }
 
       try {
         const response = await fetch(GET_CONVERSATION_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ conversation_id: conversationId }),
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch conversation');
-        }
+        if (!response.ok) throw new Error("Failed to fetch conversation");
 
         const result = await response.json();
 
-        let parsedResult = result;
-        if (Array.isArray(result) && result.length > 0) {
-          parsedResult = result[0];
+        // Handle if API returns array
+        const parsedResult = Array.isArray(result) && result.length > 0 ? result[0] : result || {};
+
+        // 🧩 Safely normalize fields
+        const safeValue = (val: any) =>
+          val === null || val === undefined ? "" : String(val);
+
+        let rawWords = parsedResult.WORDS ?? parsedResult.words ?? [];
+        if (!Array.isArray(rawWords)) {
+          if (typeof rawWords === "string" && rawWords.trim().length > 0) {
+            try {
+              rawWords = JSON.parse(rawWords);
+            } catch {
+              rawWords = rawWords.split(/[,;]+/).map((w: string) => w.trim());
+            }
+          } else {
+            rawWords = [];
+          }
         }
 
+        // ✅ Construct safe normalized data object
         setData({
           conversationId,
-          transcript: parsedResult.MOD_INP || parsedResult.transcript || '',
-          summary: parsedResult.SUMMARY || parsedResult.summary || '',
-          soap: parsedResult.SOAP || parsedResult.soap || '',
-          ehr: parsedResult.EHR || parsedResult.ehr || '',
-          words: parsedResult.WORDS || parsedResult.words || [],
+          transcript: safeValue(parsedResult.MOD_INP || parsedResult.transcript),
+          summary: safeValue(parsedResult.SUMMARY || parsedResult.summary),
+          soap: safeValue(parsedResult.SOAP || parsedResult.soap),
+          ehr: safeValue(parsedResult.EHR || parsedResult.ehr),
+          words: Array.isArray(rawWords) ? rawWords.filter(Boolean) : [],
         });
       } catch (err) {
-        console.error('Error loading conversation:', err);
-        setError('Failed to load conversation');
+        console.error("Error loading conversation:", err);
+        setError("Failed to load conversation");
       } finally {
         setLoading(false);
       }
