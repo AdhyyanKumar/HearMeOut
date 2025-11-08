@@ -49,8 +49,8 @@ export class TranscriptionService {
         const result = await response.json();
         console.log('✅ Audio sent successfully:', result);
 
-        if (result.transcript || result.text) {
-          this.notifyListeners(result.transcript || result.text);
+        if (result.text) {
+          this.notifyListeners(result.text);
         }
       } else {
         console.error('❌ Webhook response error:', response.status, response.statusText);
@@ -105,7 +105,7 @@ export class TranscriptionService {
             }
           }, 100);
         }
-      }, 2000);
+      }, 10000);
 
     } catch (error) {
       console.error('❌ Error accessing microphone:', error);
