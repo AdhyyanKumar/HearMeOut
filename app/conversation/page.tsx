@@ -185,7 +185,7 @@ export default function ConversationDetailPage() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
+          {/* <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
             <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
               <div className="w-3 h-3 rounded-full bg-amber-400" />
               <h2 className="text-xl font-semibold text-white">Key Words</h2>
@@ -204,7 +204,7 @@ export default function ConversationDetailPage() {
                 <p className="text-slate-500">No key words available</p>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
