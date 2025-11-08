@@ -31,21 +31,33 @@ const testimonials = [
 export default function LandingPage() {
   const router = useRouter();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+        setIsTransitioning(false);
+      }, 300);
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
   const nextTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      setIsTransitioning(false);
+    }, 300);
   };
-
   const prevTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   return (
@@ -70,29 +82,31 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-2xl">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 relative">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 relative overflow-hidden">
             <div className="text-cyan-400 mb-4 text-4xl">"</div>
-            <p className="text-slate-300 text-lg mb-6 leading-relaxed transition-all duration-500">
-              {testimonials[currentTestimonial].quote}
-            </p>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white font-semibold">{testimonials[currentTestimonial].author}</p>
-                <p className="text-cyan-400 text-sm">{testimonials[currentTestimonial].role}</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={prevTestimonial}
-                  className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4 text-slate-300" />
-                </button>
-                <button
-                  onClick={nextTestimonial}
-                  className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
-                >
-                  <ChevronRight className="w-4 h-4 text-slate-300" />
-                </button>
+            <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 translate-x-10' : 'opacity-100 translate-x-0'}`}>
+              <p className="text-slate-300 text-lg mb-6 leading-relaxed">
+                {testimonials[currentTestimonial].quote}
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white font-semibold">{testimonials[currentTestimonial].author}</p>
+                  <p className="text-cyan-400 text-sm">{testimonials[currentTestimonial].role}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={prevTestimonial}
+                    className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-slate-300" />
+                  </button>
+                  <button
+                    onClick={nextTestimonial}
+                    className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4 text-slate-300" />
+                  </button>
+                </div>
               </div>
             </div>
             <div className="flex gap-2 mt-4">

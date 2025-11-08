@@ -61,6 +61,9 @@ export default function TranscriptDisplay() {
         return (
           <span key={index} className="bg-yellow-200 font-semibold px-1 rounded">
             {cleanText}
+            <span className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 whitespace-pre-line text-sm bg-slate-800 text-white rounded px-2 py-1 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 w-56 text-center shadow-lg z-50">
+                "hi"
+            </span>
           </span>
         );
       }
@@ -128,7 +131,7 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'd' ? 'bg-cyan-400' : 'bg-slate-600'}`} />
-                Type A
+                Doctor
               </button>
               <button
                 onClick={() => setProcessType('p')}
@@ -139,7 +142,7 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'p' ? 'bg-cyan-400' : 'bg-slate-600'}`} />
-                Type B
+                Patient
               </button>
             </div>
             <div className="p-6 flex-1 flex flex-col">
