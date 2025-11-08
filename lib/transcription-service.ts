@@ -1,5 +1,6 @@
 const WEBHOOK_URL = 'https://hear-me-out.app.n8n.cloud/webhook-test/a448e16a-c135-49db-8aa3-95d2085f0b03';
 const CREATE_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook/12fb4fbf-2caa-4482-af7a-95fd047d649d";
+const END_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook-test/8ff67b70-9f7c-4e03-9dd1-11c3059e219a";
 
 export class TranscriptionService {
   private listeners: ((text: string) => void)[] = [];
@@ -52,6 +53,32 @@ export class TranscriptionService {
       console.error("❌ Failed to create conversation:", err);
       this.notifyError("Could not start a new conversation.");
       return null;
+    }
+  }
+
+    private async endConversation() {
+    if (!this.conversationId) {
+      console.warn("⚠️ Tried to end conversation but no ID found.");
+      return;
+    }
+
+    try {
+      const res = await fetch(END_CONVERSATION_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: this.conversationId,
+          ended_at: new Date().toISOString(),
+        }),
+      });
+
+      if (res.ok) {
+        console.log(`✅ Conversation ${this.conversationId} ended successfully.`);
+      } else {
+        console.error("❌ Failed to end conversation:", res.status, res.statusText);
+      }
+    } catch (err) {
+      console.error("❌ Error sending end conversation webhook:", err);
     }
   }
 
@@ -146,7 +173,7 @@ export class TranscriptionService {
     }
   }
 
-  stop() {
+  async stop() {
     if (!this.isActive) return;
 
     this.isActive = false;
@@ -168,11 +195,16 @@ export class TranscriptionService {
     }
 
     console.log('⏹️ Recording stopped');
+
+    await this.endConversation();
   }
+
 
   getStatus() {
     return this.isActive;
   }
+
+  
 }
 
 export const transcriptionService = new TranscriptionService();
