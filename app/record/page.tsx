@@ -51,10 +51,16 @@ export default function TranscriptDisplay() {
   }, []);
 
   useEffect(() => {
-    if (transcriptRef.current) {
-      transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight;
-    }
-  }, [transcript]);
+    const el = transcriptRef.current;
+    if (!el) return;
+
+    // Smoothly scroll to the bottom
+    el.scrollTo({
+        top: el.scrollHeight,
+        behavior: 'smooth',
+    });
+    }, [transcript]);
+
 
   useEffect(() => {
     if (processedRef.current) {
@@ -137,21 +143,21 @@ export default function TranscriptDisplay() {
         <div className="transform transition-all duration-700 ease-out h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(-100px)',
         }}>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700 h-full flex flex-col">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col h-[500px] max-h-[60vh]">
             <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
               <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
               <h2 className="text-xl font-semibold text-white">Live Transcription</h2>
             </div>
-            <div ref={transcriptRef} className="flex-1 overflow-y-auto">
-              {transcript.length === 0 ? (
+            <div ref={transcriptRef} className="flex-1 overflow-y-auto scroll-smooth bg-slate-900/30 p-4 rounded-lg border border-slate-700/40" style={{ maxHeight: "100%", minHeight: 0 }}>
+                {transcript.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-slate-500 text-center">Waiting for speech...</p>
+                    <p className="text-slate-500 text-center">Waiting for speech...</p>
                 </div>
-              ) : (
+                ) : (
                 <p className="text-slate-300 leading-relaxed text-base whitespace-pre-wrap">
-                  {renderMessage(transcript)}
+                    {renderMessage(transcript)}
                 </p>
-              )}
+                )}
             </div>
           </div>
         </div>
