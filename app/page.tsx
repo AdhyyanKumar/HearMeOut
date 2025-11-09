@@ -22,8 +22,9 @@ export default function LandingPage() {
 
   return (
     <div className="h-screen overflow-hidden bg-slate-900 flex">
-      <div className="flex-1 flex flex-col justify-between p-12 lg:p-16">
-        <div>
+      <div className="flex-1 p-12 lg:p-16 flex flex-col">
+        <div className="flex-1 flex items-center justify-center">
+          <div>
           <div className="flex items-center gap-3 mb-12">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
               <Stethoscope className="w-6 h-6 text-white" />
@@ -39,10 +40,12 @@ export default function LandingPage() {
               HearMeOut transcribes, simplifies, and summarizes your consultations in real-time — so you can stay present with your patient, not your paperwork.
             </p>
           </div>
+          </div>
         </div>
 
-        <div className="max-w-2xl">
-          <button
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-xl">
+            <button
             onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank', 'noopener,noreferrer')}
             className="group relative w-full h-56 lg:h-64 rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow"
           >
@@ -78,7 +81,8 @@ export default function LandingPage() {
                 100% { transform: scaleY(0.3); }
               }
             `}</style>
-          </button>
+            </button>
+          </div>
         </div>
       </div>
 
