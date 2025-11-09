@@ -46,7 +46,7 @@ export default function LandingPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="w-full max-w-xl">
             <button
-            onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank', 'noopener,noreferrer')}
+            onClick={() => window.open('https://youtu.be/KL_w5KCO0Nk', '_blank', 'noopener,noreferrer')}
             className="group relative w-full h-56 lg:h-64 rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow"
           >
             <div className="absolute inset-0 flex items-center justify-center gap-2 px-6">
