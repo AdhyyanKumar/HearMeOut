@@ -1,65 +1,24 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Stethoscope, Mic, History, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Stethoscope, Mic, History } from 'lucide-react';
 
-const testimonials = [
-  {
-    quote: "HearMeOut transformed how I capture ideas. The real-time transcription is incredibly accurate and the processing features save me hours of work.",
-    author: "Sarah Chen",
-    role: "Product Manager, TechCorp"
-  },
-  {
-    quote: "The dual processing types give me exactly what I need. Type A for quick notes, Type B for detailed analysis. It's like having an assistant.",
-    author: "Michael Rodriguez",
-    role: "Founder & CEO, StartupLabs"
-  },
-  {
-    quote: "I use HearMeOut for all my meetings now. The transcription quality is exceptional and I never miss important details anymore.",
-    author: "Emily Watson",
-    role: "Marketing Director, CreativeFlow"
-  },
-  {
-    quote: "As a researcher, accurate transcription is crucial. HearMeOut delivers consistently and the interface is beautifully intuitive.",
-    author: "Dr. James Anderson",
-    role: "Research Scientist, InnovateLab"
-  }
-];
+// testimonials removed; replaced with promo button
 
 export default function LandingPage() {
   const router = useRouter();
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-        setIsTransitioning(false);
-      }, 300);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const nextTestimonial = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-      setIsTransitioning(false);
-    }, 300);
-  };
-
-  const prevTestimonial = () => {
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-      setIsTransitioning(false);
-    }, 300);
-  };
+  // testimonial carousel removed
+  const bars = useMemo(
+    () =>
+      Array.from({ length: 20 }).map(() => ({
+        delay: Math.random() * 1.0, // 0s - 1s
+        duration: 1.35 + Math.random(), // 0.9s - 1.8s
+        height: 30 + Math.floor(Math.random() * 50), // 35% - 85%
+      })),
+    []
+  );
 
   return (
     <div className="h-screen overflow-hidden bg-slate-900 flex">
@@ -83,44 +42,43 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-2xl">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700 relative overflow-hidden">
-            <div className="text-cyan-400 mb-4 text-4xl">"</div>
-            <div className={`transition-all duration-300 ${isTransitioning ? 'opacity-0 translate-x-10' : 'opacity-100 translate-x-0'}`}>
-              <p className="text-slate-300 text-lg mb-6 leading-relaxed">
-                {testimonials[currentTestimonial].quote}
-              </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white font-semibold">{testimonials[currentTestimonial].author}</p>
-                  <p className="text-cyan-400 text-sm">{testimonials[currentTestimonial].role}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={prevTestimonial}
-                    className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-slate-300" />
-                  </button>
-                  <button
-                    onClick={nextTestimonial}
-                    className="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600 flex items-center justify-center transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4 text-slate-300" />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2 mt-4">
-              {testimonials.map((_, index) => (
-                <div
-                  key={index}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === currentTestimonial ? 'w-8 bg-cyan-400' : 'w-1 bg-slate-600'
-                  }`}
+          <button
+            onClick={() => window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank', 'noopener,noreferrer')}
+            className="group relative w-full h-56 lg:h-64 rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/50 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-shadow"
+          >
+            <div className="absolute inset-0 flex items-center justify-center gap-2 px-6">
+              {bars.map((b, i) => (
+                <span
+                  key={i}
+                  className="bar block w-[8px] bg-gradient-to-t from-cyan-500 to-blue-500/80 rounded-sm opacity-80"
+                  style={{
+                    height: `${b.height}%`,
+                    animationDelay: `${b.delay}s`,
+                    animationDuration: `${b.duration}s`,
+                  }}
                 />
               ))}
             </div>
-          </div>
+            <div className="absolute inset-0 bg-slate-900/70 group-hover:bg-slate-900/60 transition-colors" />
+            <div className="absolute inset-0 flex items-center justify-center text-center px-8">
+              <p className="text-slate-100 text-lg lg:text-xl font-medium">
+                See how HearMeOut captures and organizes<br></br>doctor-patient conversations in real-time
+              </p>
+            </div>
+            <style jsx>{`
+              .bar {
+                transform-origin: center;
+                animation: wave ease-in-out infinite;
+              }
+              @keyframes wave {
+                0% { transform: scaleY(0.3); }
+                20% { transform: scaleY(0.9); }
+                50% { transform: scaleY(1); }
+                80% { transform: scaleY(0.6); }
+                100% { transform: scaleY(0.3); }
+              }
+            `}</style>
+          </button>
         </div>
       </div>
 
