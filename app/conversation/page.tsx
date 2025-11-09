@@ -130,7 +130,9 @@ export default function ConversationDetailPage() {
       if (part.match(/^<[^>]+>$/)) {
         const cleanText = part.slice(1, -1);
         return (
-          <span key={index} className="bg-yellow-200 font-semibold px-1 rounded">
+          <span key={index} className="relative font-semibold px-1 rounded" style={{
+            backgroundColor: 'rgba(255, 255, 0, 0.15)',
+            borderBottom: '2px solid rgba(255, 255, 0, 0.6)',}}>
             {cleanText}
           </span>
         );
@@ -172,7 +174,7 @@ export default function ConversationDetailPage() {
             </div>
             <div className="max-h-96 overflow-y-auto">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {data.summary || 'No summary available'}
+                {renderMessage(data.summary || 'No summary available')}
               </p>
             </div>
           </div>
@@ -184,7 +186,7 @@ export default function ConversationDetailPage() {
             </div>
             <div className="max-h-96 overflow-y-auto">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {data.soap || 'No SOAP notes available'}
+                {renderMessage(data.soap || 'No SOAP notes available')}
               </p>
             </div>
           </div>
@@ -196,7 +198,7 @@ export default function ConversationDetailPage() {
             </div>
             <div className="max-h-96 overflow-y-auto">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {data.ehr || 'No EHR notes available'}
+                {renderMessage(data.ehr || 'No EHR notes available')}
               </p>
             </div>
           </div>

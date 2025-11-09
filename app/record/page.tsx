@@ -145,7 +145,9 @@ export default function TranscriptDisplay() {
       if (part.match(/^<[^>]+>$/)) {
         const cleanText = part.slice(1, -1);
         return (
-          <span key={index} className="bg-yellow-200 font-semibold px-1 rounded">
+          <span key={index} className="relative font-semibold px-1 rounded" style={{
+            backgroundColor: 'rgba(255, 255, 0, 0.15)',
+            borderBottom: '2px solid rgba(255, 255, 0, 0.6)',}}>
             {cleanText}
           </span>
         );
@@ -190,7 +192,7 @@ export default function TranscriptDisplay() {
         <div className="transform transition-all duration-700 ease-out h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(-100px)',
         }}>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col h-[500px] max-h-[60vh]">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-slate-700 flex flex-col h-[620px] max-h-[70vh]">
             <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
               <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
               <h2 className="text-xl font-semibold text-white">Live Transcription</h2>
