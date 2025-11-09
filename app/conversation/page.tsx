@@ -142,88 +142,68 @@ export default function ConversationDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            onClick={() => router.push('/history')}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full shadow-lg border border-slate-700 w-12 h-12 p-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-4xl font-bold text-cyan-400">Conversation Details</h1>
-        </div>
+    <div className="h-screen bg-slate-900 p-6 flex flex-col">
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          onClick={() => router.push('/history')}
+          className="bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full shadow-lg border border-slate-700 w-12 h-12 p-0"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-3xl font-bold text-cyan-400">Conversation Details</h1>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-hidden mb-6">
+          {/* Transcript (Left) */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-700 flex-shrink-0">
               <div className="w-3 h-3 rounded-full bg-blue-400" />
               <h2 className="text-xl font-semibold text-white">Transcript</h2>
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="overflow-y-auto flex-1 rounded-lg bg-slate-900/30 p-4 border border-slate-700/40">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
                 {renderMessage(data.transcript || 'No transcript available')}
               </p>
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
+        {/* Right Column (Summary + SOAP) */}
+        <div className="flex flex-col gap-6 h-full">
+          {/* Summary (40% of right column) */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-700 p-6 flex flex-col" style={{ height: 'calc(40% - 12px)' }}>
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-700 flex-shrink-0">
               <div className="w-3 h-3 rounded-full bg-cyan-400" />
               <h2 className="text-xl font-semibold text-white">Summary</h2>
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="overflow-y-auto flex-1 bg-slate-900/30 p-4 rounded-lg border border-slate-700/40">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
                 {renderMessage(data.summary || 'No summary available')}
               </p>
             </div>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
+          {/* SOAP (60% of right column) */}
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-700 p-6 flex flex-col" style={{ height: 'calc(60% - 12px)' }}>
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-700 flex-shrink-0">
               <div className="w-3 h-3 rounded-full bg-emerald-400" />
               <h2 className="text-xl font-semibold text-white">SOAP Notes</h2>
             </div>
-            <div className="max-h-96 overflow-y-auto">
+            <div className="overflow-y-auto flex-1 bg-slate-900/30 p-4 rounded-lg border border-slate-700/40">
               <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
                 {renderMessage(data.soap || 'No SOAP notes available')}
               </p>
             </div>
           </div>
-
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
-              <div className="w-3 h-3 rounded-full bg-purple-400" />
-              <h2 className="text-xl font-semibold text-white">EHR Notes</h2>
-            </div>
-            <div className="max-h-96 overflow-y-auto">
-              <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-                {renderMessage(data.ehr || 'No EHR notes available')}
-              </p>
-            </div>
-          </div>
-
-          {/* <div className="lg:col-span-2 bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
-              <div className="w-3 h-3 rounded-full bg-amber-400" />
-              <h2 className="text-xl font-semibold text-white">Key Words</h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {data.words && data.words.length > 0 ? (
-                data.words.map((word, index) => (
-                  <span
-                    key={index}
-                    className="bg-slate-700 text-slate-200 px-4 py-2 rounded-full text-sm"
-                  >
-                    {typeof word === 'string' ? word : JSON.stringify(word)}
-                  </span>
-                ))
-              ) : (
-                <p className="text-slate-500">No key words available</p>
-              )}
-            </div>
-          </div> */}
         </div>
+      </div>
+
+      <div className="flex justify-center">
+        <Button
+          onClick={() => console.log('Export EHR (future PDF):', data.ehr)}
+          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 text-lg rounded-full shadow-lg"
+        >
+          Export EHR
+        </Button>
       </div>
     </div>
   );
