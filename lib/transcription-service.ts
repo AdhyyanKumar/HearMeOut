@@ -20,6 +20,12 @@ export class TranscriptionService {
   private sendInterval: NodeJS.Timeout | null = null;
   private conversationId: string | null = null;
   private fullTranscript: string = '';
+  private translating: boolean = false;
+
+  setTranslating(enabled: boolean) {
+    this.translating = enabled;
+    console.log("🌐 Translation mode set to:", enabled);
+  }
 
   subscribe(callback: (text: string) => void) {
     this.listeners.push(callback);
@@ -135,6 +141,7 @@ export class TranscriptionService {
       formData.append('audio', audioBlob, 'recording.webm');
       formData.append('timestamp', new Date().toISOString());
       formData.append("conversation_id", this.conversationId);
+      formData.append("translate", this.translating ? "true" : "false");
 
       console.log('📤 Sending audio chunk to webhook:', audioBlob.size, 'bytes');
 
@@ -207,7 +214,7 @@ export class TranscriptionService {
             }
           }, 100);
         }
-      }, 10000);
+      }, (this.translating ? 15000 : 10000));
 
       return true;
 

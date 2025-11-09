@@ -11,6 +11,7 @@ interface ConversationData {
   summary: string;
   soap: string;
   ehr: string;
+  words: any[];
 }
 
 const GET_CONVERSATION_WEBHOOK = "https://hear-me-out.app.n8n.cloud/webhook/e867834e-49e6-4919-8370-6bf8adfe78cb";
@@ -62,9 +63,13 @@ export default function ConversationDetailPage() {
           summary: String(parsedResult.SUMMARY || parsedResult.summary || ''),
           soap: String(parsedResult.SOAP || parsedResult.soap || ''),
           ehr: String(parsedResult.EHR || parsedResult.ehr || ''),
+          words: Array.isArray(JSON.parse(parsedResult?.WORDS) || JSON.parse(parsedResult?.words)) ? JSON.parse(parsedResult.WORDS) : [],
         };
 
         setData(normalizedData);
+        console.log(normalizedData);
+        console.log(parsedResult);
+        console.log(result);
       } catch (err) {
         console.error("Error loading conversation:", err);
         setError("Failed to load conversation");
@@ -80,8 +85,10 @@ export default function ConversationDetailPage() {
     if (!text) return null;
 
     const lines = text.split('\n');
+    let idx = 0;
 
     return lines.map((line, i) => {
+      // Section headers (like **Subjective**)
       if (line.match(/^\*\*[^*]+\*\*$/)) {
         const cleanText = line.replace(/\*\*/g, '');
         return (
@@ -91,6 +98,7 @@ export default function ConversationDetailPage() {
         );
       }
 
+      // Lines containing <highlighted> words
       if (line.includes('<') && line.includes('>')) {
         const parts = line.split(/(<[^>]+>)/g);
         return (
@@ -98,9 +106,20 @@ export default function ConversationDetailPage() {
             {parts.map((part, j) => {
               if (part.match(/^<[^>]+>$/)) {
                 const cleanText = part.slice(1, -1);
+                const explanation = data?.words?.[idx] || null;
+                idx++;
+
                 return (
-                  <span key={j} className="font-semibold px-1 bg-yellow-500/20 border-b-2 border-yellow-500/60">
+                  <span
+                    key={j}
+                    className="relative font-semibold px-1 bg-yellow-500/20 border-b-2 border-yellow-500/80 hover:bg-yellow-500/30 cursor-pointer group"
+                  >
                     {cleanText}
+                    {explanation && (
+                      <div className="absolute left-0 top-full mt-2 w-64 bg-slate-800 text-slate-200 text-sm rounded-lg shadow-lg border border-slate-700 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
+                        {explanation}
+                      </div>
+                    )}
                   </span>
                 );
               }
@@ -110,10 +129,10 @@ export default function ConversationDetailPage() {
         );
       }
 
-      if (line.trim() === '') {
-        return <div key={i} className="h-2" />;
-      }
+      // Empty lines → spacing
+      if (line.trim() === '') return <div key={i} className="h-2" />;
 
+      // Normal text lines
       return <div key={i} className="mb-1">{line}</div>;
     });
   };
@@ -157,12 +176,6 @@ export default function ConversationDetailPage() {
           </Button>
           <h1 className="text-3xl font-bold text-cyan-400">Conversation Details</h1>
         </div>
-        <Button
-          onClick={() => console.log('Export EHR:', data.ehr)}
-          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 text-lg rounded-full"
-        >
-          Export EHR
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -180,10 +193,18 @@ export default function ConversationDetailPage() {
 
         <div className="flex flex-col gap-6">
           <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-700">
-              <div className="w-3 h-3 rounded-full bg-cyan-400" />
-              <h2 className="text-xl font-semibold text-white">Summary</h2>
-            </div>
+            <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-cyan-400" />
+                <h2 className="text-xl font-semibold text-white">Summary</h2>
+              </div>
+                <Button
+                  onClick={() => console.log('Send Summary:', data.summary)}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 text-sm rounded-full"
+                >
+                  Email Summary To Patient
+                </Button>
+              </div>
             <div className="bg-slate-900/30 p-4 rounded-lg border border-slate-700/40 max-h-[250px] overflow-y-auto">
               <div className="text-slate-300 leading-relaxed">
                 {formatText(data.summary) || <p className="text-slate-500">No summary available</p>}
@@ -192,9 +213,17 @@ export default function ConversationDetailPage() {
           </div>
 
           <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-700">
-              <div className="w-3 h-3 rounded-full bg-emerald-400" />
-              <h2 className="text-xl font-semibold text-white">SOAP Notes</h2>
+            <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-700">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                <h2 className="text-xl font-semibold text-white">SOAP Notes</h2>
+              </div>
+              <Button
+                onClick={() => console.log('Export EHR:', data.ehr)}
+                className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-6 py-3 text-sm rounded-full"
+              >
+                Export EHR
+              </Button>
             </div>
             <div className="bg-slate-900/30 p-4 rounded-lg border border-slate-700/40 max-h-[320px] overflow-y-auto">
               <div className="text-slate-300 leading-relaxed">

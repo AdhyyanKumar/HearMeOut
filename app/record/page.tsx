@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { transcriptionService } from '@/lib/transcription-service';
+import { Switch } from '@/components/ui/switch';
 
 function LoadingDots() {
   const [dots, setDots] = useState('.');
@@ -31,6 +32,7 @@ export default function TranscriptDisplay() {
   const [doctorTranslation, setDoctorTranslation] = useState<string>('');
   const [patientTranslation, setPatientTranslation] = useState<string>('');
   const [processedText, setProcessedText] = useState<string>('');
+  const [needsTranslation, setNeedsTranslation] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
@@ -172,6 +174,27 @@ export default function TranscriptDisplay() {
         }`}>
           HearMeOut
         </h1>
+        {!isRecording && (
+          <div className="mb-6 bg-slate-800/70 backdrop-blur-sm rounded-xl p-6 border border-slate-700 shadow-xl">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex flex-col gap-1">
+                <label htmlFor="translation-toggle" className="text-white font-medium text-base cursor-pointer">
+                  Patient speaks another language?
+                </label>
+                <p className="text-slate-400 text-sm">Enable real-time translation</p>
+              </div>
+              <Switch
+                id="translation-toggle"
+                checked={needsTranslation}
+                onCheckedChange={(checked) => {
+                  setNeedsTranslation(checked);
+                  transcriptionService.setTranslating(checked);
+                }}
+                className="data-[state=checked]:bg-cyan-500"
+              />
+            </div>
+          </div>
+        )}
         <Button
           onClick={handleToggleRecording}
           disabled={isStarting || isStopping}
