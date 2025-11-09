@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -24,6 +25,7 @@ export default function ConversationDetailPage() {
   const [data, setData] = useState<ConversationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const transcriptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!conversationId) {
@@ -110,17 +112,13 @@ export default function ConversationDetailPage() {
                 idx++;
 
                 return (
-                  <span
+                  <HighlightWord
                     key={j}
-                    className="relative font-semibold px-1 bg-yellow-500/20 border-b-2 border-yellow-500/80 hover:bg-yellow-500/30 cursor-pointer group"
+                    explanation={explanation}
+                    containerRef={transcriptRef}
                   >
                     {cleanText}
-                    {explanation && (
-                      <div className="absolute left-0 top-full mt-2 w-64 bg-slate-800 text-slate-200 text-sm rounded-lg shadow-lg border border-slate-700 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
-                        {explanation}
-                      </div>
-                    )}
-                  </span>
+                  </HighlightWord>
                 );
               }
               return <span key={j}>{part}</span>;
@@ -184,7 +182,7 @@ export default function ConversationDetailPage() {
             <div className="w-3 h-3 rounded-full bg-blue-400" />
             <h2 className="text-xl font-semibold text-white">Transcript</h2>
           </div>
-          <div className="bg-slate-900/30 p-4 rounded-lg border border-slate-700/40 max-h-[600px] overflow-y-auto">
+          <div ref={transcriptRef} className="relative bg-slate-900/30 p-4 rounded-lg border border-slate-700/40 max-h-[600px] overflow-y-auto">
             <div className="text-slate-300 leading-relaxed">
               {formatText(data.transcript) || <p className="text-slate-500">No transcript available</p>}
             </div>
@@ -234,5 +232,125 @@ export default function ConversationDetailPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+type Placement = 'top' | 'bottom' | 'left' | 'right';
+
+function HighlightWord({
+  children,
+  explanation,
+  containerRef,
+}: {
+  children: React.ReactNode;
+  explanation: string | null;
+  containerRef: React.RefObject<HTMLDivElement>;
+}) {
+  const [show, setShow] = useState(false);
+  const [placement, setPlacement] = useState<Placement>('bottom');
+  const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!show || !explanation) return;
+
+    const triggerEl = triggerRef.current;
+    const tooltipEl = tooltipRef.current;
+    const containerEl = containerRef.current;
+    if (!triggerEl || !tooltipEl || !containerEl) return;
+
+    const compute = () => {
+      const m = 8; // margin
+      const containerRect = containerEl.getBoundingClientRect();
+      const triggerRect = triggerEl.getBoundingClientRect();
+      const tooltipWidth = tooltipEl.offsetWidth || 256;
+      const tooltipHeight = tooltipEl.offsetHeight || 60;
+
+      // Coordinates relative to container content (account for scroll)
+      const triggerLeft = triggerRect.left - containerRect.left + containerEl.scrollLeft;
+      const triggerTop = triggerRect.top - containerRect.top + containerEl.scrollTop;
+
+      const topAvail = triggerTop - containerEl.scrollTop;
+      const bottomAvail = containerEl.scrollTop + containerEl.clientHeight - (triggerTop + triggerRect.height);
+      const leftAvail = triggerLeft - containerEl.scrollLeft;
+      const rightAvail = containerEl.scrollLeft + containerEl.clientWidth - (triggerLeft + triggerRect.width);
+
+      let p: Placement = 'bottom';
+      if (bottomAvail < tooltipHeight + m && topAvail >= bottomAvail) p = 'top';
+      if (p === 'bottom' || p === 'top') {
+        if (leftAvail < tooltipWidth / 2 + m && rightAvail >= tooltipWidth + m) p = 'right';
+        else if (rightAvail < tooltipWidth / 2 + m && leftAvail >= tooltipWidth + m) p = 'left';
+      }
+      if ((p === 'bottom' && bottomAvail < tooltipHeight + m) || (p === 'top' && topAvail < tooltipHeight + m)) {
+        p = rightAvail >= leftAvail ? 'right' : 'left';
+      }
+      if (p === 'left' && leftAvail < tooltipWidth + m) p = rightAvail >= tooltipWidth + m ? 'right' : (bottomAvail >= topAvail ? 'bottom' : 'top');
+      if (p === 'right' && rightAvail < tooltipWidth + m) p = leftAvail >= tooltipWidth + m ? 'left' : (bottomAvail >= topAvail ? 'bottom' : 'top');
+
+      // Base position before clamping
+      let left = 0;
+      let top = 0;
+      if (p === 'bottom') {
+        top = triggerTop + triggerRect.height + m;
+        left = triggerLeft + triggerRect.width / 2 - tooltipWidth / 2;
+      } else if (p === 'top') {
+        top = triggerTop - tooltipHeight - m;
+        left = triggerLeft + triggerRect.width / 2 - tooltipWidth / 2;
+      } else if (p === 'left') {
+        top = triggerTop + triggerRect.height / 2 - tooltipHeight / 2;
+        left = triggerLeft - tooltipWidth - m;
+      } else {
+        top = triggerTop + triggerRect.height / 2 - tooltipHeight / 2;
+        left = triggerLeft + triggerRect.width + m;
+      }
+
+      // Clamp to visible area of container (accounting for scroll)
+      const minLeft = containerEl.scrollLeft + m;
+      const maxLeft = containerEl.scrollLeft + containerEl.clientWidth - tooltipWidth - m;
+      const minTop = containerEl.scrollTop + m;
+      const maxTop = containerEl.scrollTop + containerEl.clientHeight - tooltipHeight - m;
+
+      left = Math.min(Math.max(left, minLeft), Math.max(minLeft, maxLeft));
+      top = Math.min(Math.max(top, minTop), Math.max(minTop, maxTop));
+
+      setPlacement(p);
+      setCoords({ top, left });
+    };
+
+    compute();
+    const onScroll = () => compute();
+    const onResize = () => compute();
+    containerEl.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize);
+    return () => {
+      containerEl.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [show, explanation, containerRef]);
+
+  const baseTooltip =
+    'pointer-events-none absolute w-64 bg-gray-100 text-black text-sm rounded-lg shadow-lg border border-gray-300 p-3 transition-opacity duration-150 z-50';
+
+  return (
+    <span
+      ref={triggerRef}
+      className="relative font-semibold px-1 bg-yellow-500/10 border-b-2 border-yellow-500/80 hover:bg-yellow-500/30 cursor-pointer"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {explanation && show && containerRef.current &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            className={`${baseTooltip} ${show ? 'opacity-100' : 'opacity-0'}`}
+            style={{ top: coords.top, left: coords.left }}
+          >
+            {explanation}
+          </div>,
+          containerRef.current
+        )}
+    </span>
   );
 }
