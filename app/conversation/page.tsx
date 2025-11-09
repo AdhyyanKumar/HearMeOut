@@ -251,6 +251,7 @@ function HighlightWord({
   const [coords, setCoords] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!show || !explanation) return;
@@ -288,21 +289,35 @@ function HighlightWord({
       if (p === 'left' && leftAvail < tooltipWidth + m) p = rightAvail >= tooltipWidth + m ? 'right' : (bottomAvail >= topAvail ? 'bottom' : 'top');
       if (p === 'right' && rightAvail < tooltipWidth + m) p = leftAvail >= tooltipWidth + m ? 'left' : (bottomAvail >= topAvail ? 'bottom' : 'top');
 
-      // Base position before clamping
+      // Base position before clamping (anchor to one side of the word)
       let left = 0;
       let top = 0;
       if (p === 'bottom') {
         top = triggerTop + triggerRect.height + m;
-        left = triggerLeft + triggerRect.width / 2 - tooltipWidth / 2;
+        // Prefer left-align under the word; if overflow, align to right edge
+        const leftAligned = triggerLeft;
+        const rightAligned = triggerLeft + triggerRect.width - tooltipWidth;
+        const maxLeftRaw = containerEl.scrollLeft + containerEl.clientWidth - tooltipWidth - m;
+        left = leftAligned <= maxLeftRaw ? leftAligned : Math.max(rightAligned, containerEl.scrollLeft + m);
       } else if (p === 'top') {
         top = triggerTop - tooltipHeight - m;
-        left = triggerLeft + triggerRect.width / 2 - tooltipWidth / 2;
+        const leftAligned = triggerLeft;
+        const rightAligned = triggerLeft + triggerRect.width - tooltipWidth;
+        const maxLeftRaw = containerEl.scrollLeft + containerEl.clientWidth - tooltipWidth - m;
+        left = leftAligned <= maxLeftRaw ? leftAligned : Math.max(rightAligned, containerEl.scrollLeft + m);
       } else if (p === 'left') {
-        top = triggerTop + triggerRect.height / 2 - tooltipHeight / 2;
         left = triggerLeft - tooltipWidth - m;
+        // Prefer top-align; if overflow, align to bottom edge of the word
+        const topAligned = triggerTop;
+        const bottomAligned = triggerTop + triggerRect.height - tooltipHeight;
+        const maxTopRaw = containerEl.scrollTop + containerEl.clientHeight - tooltipHeight - m;
+        top = topAligned <= maxTopRaw ? topAligned : Math.max(bottomAligned, containerEl.scrollTop + m);
       } else {
-        top = triggerTop + triggerRect.height / 2 - tooltipHeight / 2;
         left = triggerLeft + triggerRect.width + m;
+        const topAligned = triggerTop;
+        const bottomAligned = triggerTop + triggerRect.height - tooltipHeight;
+        const maxTopRaw = containerEl.scrollTop + containerEl.clientHeight - tooltipHeight - m;
+        top = topAligned <= maxTopRaw ? topAligned : Math.max(bottomAligned, containerEl.scrollTop + m);
       }
 
       // Clamp to visible area of container (accounting for scroll)
@@ -330,14 +345,23 @@ function HighlightWord({
   }, [show, explanation, containerRef]);
 
   const baseTooltip =
-    'pointer-events-none absolute w-64 bg-gray-100 text-black text-sm rounded-lg shadow-lg border border-gray-300 p-3 transition-opacity duration-150 z-50';
+    'pointer-events-none absolute w-64 bg-gray-100 text-black text-sm rounded-lg shadow-lg border border-gray-300 p-3 transition-opacity duration-100 z-50';
 
   return (
     <span
       ref={triggerRef}
       className="relative font-semibold px-1 bg-yellow-500/10 border-b-2 border-yellow-500/80 hover:bg-yellow-500/30 cursor-pointer"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      onMouseEnter={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => setShow(true), 300);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) {
+          clearTimeout(hoverTimerRef.current);
+          hoverTimerRef.current = null;
+        }
+        setShow(false);
+      }}
     >
       {children}
       {explanation && show && containerRef.current &&
