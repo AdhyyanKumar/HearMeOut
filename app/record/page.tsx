@@ -23,9 +23,13 @@ function LoadingDots() {
   return <span>Starting Recording{dots}</span>;
 }
 
+const TRANSLATION_WEBHOOK = 'https://hear-me-out.app.n8n.cloud/webhook/cc4932d6-c11e-4d01-9c64-eb787c451a48';
+
 export default function TranscriptDisplay() {
   const router = useRouter();
   const [transcript, setTranscript] = useState<string>('');
+  const [doctorTranslation, setDoctorTranslation] = useState<string>('');
+  const [patientTranslation, setPatientTranslation] = useState<string>('');
   const [processedText, setProcessedText] = useState<string>('');
   const [isRecording, setIsRecording] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
@@ -33,6 +37,31 @@ export default function TranscriptDisplay() {
   const [processType, setProcessType] = useState<'a' | 'b'>('a');
   const transcriptRef = useRef<HTMLDivElement>(null);
   const processedRef = useRef<HTMLDivElement>(null);
+  const translationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const callTranslationWebhook = async (text: string) => {
+        try {
+        const response = await fetch(TRANSLATION_WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transcript: text }),
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            console.log('Translation result:', result);
+
+            if (result[1].doctor) {
+            setDoctorTranslation(result[1].doctor);
+            }
+            if (result[0].patient) {
+            setPatientTranslation(result[0].patient);
+            }
+        }
+        } catch (error) {
+        console.error('Translation webhook error:', error);
+        }
+    };
 
   useEffect(() => {
     const unsubscribe = transcriptionService.subscribe((textChunk) => {
@@ -51,6 +80,24 @@ export default function TranscriptDisplay() {
   }, []);
 
   useEffect(() => {
+    if (transcript && isRecording) {
+      if (translationTimeoutRef.current) {
+        clearTimeout(translationTimeoutRef.current);
+      }
+
+      translationTimeoutRef.current = setTimeout(() => {
+        callTranslationWebhook(transcript);
+      }, 1000);
+    }
+
+    return () => {
+      if (translationTimeoutRef.current) {
+        clearTimeout(translationTimeoutRef.current);
+      }
+    };
+  }, [transcript, isRecording]);
+
+  useEffect(() => {
     const el = transcriptRef.current;
     if (!el) return;
 
@@ -66,7 +113,7 @@ export default function TranscriptDisplay() {
     if (processedRef.current) {
       processedRef.current.scrollTop = processedRef.current.scrollHeight;
     }
-  }, [processedText]);
+  }, [doctorTranslation, patientTranslation]);
 
   const handleToggleRecording = async () => {
     if (isRecording) {
@@ -137,9 +184,9 @@ export default function TranscriptDisplay() {
         </Button>
       </div>
 
-      <div className={`w-full max-w-7xl absolute bottom-8 left-1/2 -translate-x-1/2 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-700 ${
+      <div className={`w-full max-w-8xl absolute bottom-10 left-1/2 -translate-x-1/2 grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-700 ${
         isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none'
-      }`} style={{ height: 'calc(100vh - 280px)' }}>
+      }`} style={{ height: 'calc(100vh - 220px)' }}>
         <div className="transform transition-all duration-700 ease-out h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(-100px)',
         }}>
@@ -176,7 +223,7 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'a' ? 'bg-cyan-400' : 'bg-slate-600'}`} />
-                Type A
+                Doctor
               </button>
               <button
                 onClick={() => setProcessType('b')}
@@ -187,25 +234,35 @@ export default function TranscriptDisplay() {
                 }`}
               >
                 <div className={`w-2 h-2 rounded-full ${processType === 'b' ? 'bg-cyan-400' : 'bg-slate-600'}`} />
-                Type B
+                Patient
               </button>
             </div>
             <div className="p-6 flex-1 flex flex-col">
               <div ref={processedRef} className="flex-1 overflow-y-auto">
-                {processedText.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-slate-500 text-center">
-                      {processType === 'a' ? 'Type A processing will appear here...' : 'Type B processing will appear here...'}
-                    </p>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="text-xs text-slate-500 mb-2">Using Process Type {processType.toUpperCase()}</div>
-                    <p className="text-slate-300 leading-relaxed text-base whitespace-pre-wrap">
-                      {processedText}
-                    </p>
-                  </div>
-                )}
+                {(() => {
+                  const displayText = processType === 'a' ? doctorTranslation : patientTranslation;
+
+                  /*if (displayText.length === 0) {
+                    return (
+                      <div className="flex items-center justify-center h-full">
+                        <p className="text-slate-500 text-center">
+                          {processType === 'a' ? 'Doctor translation will appear here...' : 'Patient translation will appear here...'}
+                        </p>
+                      </div>
+                    );
+                  }*/
+
+                  return (
+                    <div>
+                      <div className="text-xs text-slate-500 mb-2">
+                        {processType === 'a' ? 'Doctor View' : 'Patient View'}
+                      </div>
+                      <p className="text-slate-300 leading-relaxed text-base whitespace-pre-wrap">
+                        {displayText}
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
