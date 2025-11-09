@@ -108,11 +108,13 @@ export default function TranscriptDisplay() {
     });
     }, [transcript]);
 
-
   useEffect(() => {
-    if (processedRef.current) {
-      processedRef.current.scrollTop = processedRef.current.scrollHeight;
-    }
+    const el = processedRef.current;
+    if (!el) return;
+    const timeout = setTimeout(() => {
+      el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    }, 100);
+    return () => clearTimeout(timeout);
   }, [doctorTranslation, patientTranslation]);
 
   const handleToggleRecording = async () => {
@@ -240,20 +242,9 @@ export default function TranscriptDisplay() {
               </button>
             </div>
             <div className="p-6 flex-1 flex flex-col">
-              <div ref={processedRef} className="flex-1 overflow-y-auto">
+              <div ref={processedRef} className="flex-1 overflow-y-auto scroll-smooth bg-slate-900/30 p-4 rounded-lg border border-slate-700/40" style={{ maxHeight: "100%", minHeight: 0 }}>
                 {(() => {
                   const displayText = processType === 'a' ? doctorTranslation : patientTranslation;
-
-                  /*if (displayText.length === 0) {
-                    return (
-                      <div className="flex items-center justify-center h-full">
-                        <p className="text-slate-500 text-center">
-                          {processType === 'a' ? 'Doctor translation will appear here...' : 'Patient translation will appear here...'}
-                        </p>
-                      </div>
-                    );
-                  }*/
-
                   return (
                     <div>
                       <div className="text-xs text-slate-500 mb-2">
