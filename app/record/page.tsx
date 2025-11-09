@@ -161,7 +161,7 @@ export default function TranscriptDisplay() {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-900 flex flex-col items-center p-8">
+    <div className="relative h-screen overflow-hidden bg-slate-900 flex flex-col items-center p-8">
       <Button
         onClick={() => router.push('/')}
         className="absolute top-8 left-8 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full shadow-lg border border-slate-700 w-12 h-12 p-0 z-10"
@@ -176,7 +176,7 @@ export default function TranscriptDisplay() {
         </h1>
         {!isRecording && (
           <div className="mb-6 bg-slate-800/70 backdrop-blur-sm rounded-xl p-6 border border-slate-700 shadow-xl">
-            <div className="flex items-center justify-between gap-6">
+            <div className="flex items-center justify-between gap-8">
               <div className="flex flex-col gap-1">
                 <label htmlFor="translation-toggle" className="text-white font-medium text-base cursor-pointer">
                   Patient speaks another language?
@@ -190,7 +190,7 @@ export default function TranscriptDisplay() {
                   setNeedsTranslation(checked);
                   transcriptionService.setTranslating(checked);
                 }}
-                className="data-[state=checked]:bg-cyan-500"
+                className="data-[state=unchecked]:bg-slate-700 data-[state=checked]:bg-cyan-500"
               />
             </div>
           </div>
@@ -211,13 +211,16 @@ export default function TranscriptDisplay() {
         </Button>
       </div>
 
-      <div className={`w-full max-w-8xl absolute bottom-10 left-1/2 -translate-x-1/2 grid grid-cols-1 md:grid-cols-2 gap-8 transition-all duration-700 ${
-        isRecording ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20 pointer-events-none'
-      }`} style={{ height: 'calc(100vh - 220px)' }}>
+      <div
+        className={`absolute bottom-10 left-1/2 -translate-x-1/2 grid grid-cols-1 md:grid-cols-2 transition-all duration-700 w-full ${
+          isRecording ? 'max-w-[1600px] gap-10 opacity-100 translate-y-4' : 'max-w-6xl gap-8 opacity-0 translate-y-20 pointer-events-none'
+        }`}
+        style={{ height: 'calc(100vh - 220px)' }}
+      >
         <div className="transform transition-all duration-700 ease-out h-full" style={{
           transform: isRecording ? 'translateX(0)' : 'translateX(-100px)',
         }}>
-          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-slate-700 flex flex-col h-[620px] max-h-[70vh]">
+          <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-slate-700 flex flex-col h-full">
             <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-700">
               <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
               <h2 className="text-xl font-semibold text-white">Live Transcription</h2>

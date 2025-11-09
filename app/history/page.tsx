@@ -19,7 +19,7 @@ export default function HistoryPage() {
 
   return (
     <div className="h-screen overflow-hidden bg-slate-900 flex flex-col p-8">
-      <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center h-full space-y-8">
+      <div className="max-w-2xl mx-auto w-full flex flex-col items-center justify-center h-full space-y-12">
         <Button
           onClick={() => router.push('/')}
           className="absolute top-8 left-8 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-full shadow-lg border border-slate-700 w-12 h-12 p-0"
@@ -36,7 +36,7 @@ export default function HistoryPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-md space-y-12">
           <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700 p-8">
             <label htmlFor="sessionId" className="block text-sm font-medium text-slate-300 mb-2">
               Session ID
